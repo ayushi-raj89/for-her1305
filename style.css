@@ -436,7 +436,43 @@ body {
 .menu-footer {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 16px; /* Gap between install and music buttons */
     margin-top: 15px; /* Moved slightly up to prevent overlaying bottom lyrics */
+}
+
+.install-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-color);
+    padding: 14px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.install-btn:hover {
+    border-color: var(--accent);
+    background: var(--glass-bg-hover);
+    box-shadow: 0 4px 15px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+.install-btn.hidden {
+    display: none !important;
+}
+
+.install-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--accent);
 }
 
 .music-btn {

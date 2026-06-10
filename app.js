@@ -153,6 +153,23 @@ function setupEventListeners() {
             }
         });
     });
+
+    // PWA Install Button Click Handler
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            // We've used the prompt, and can't use it again
+            deferredPrompt = null;
+            // Hide our custom install button
+            installBtn.classList.add('hidden');
+        });
+    }
 }
 
 // --- Unlock Event (Plays Music & Transitions) ---
@@ -617,3 +634,27 @@ function updateSpotifyLyricsHighlight(activeIndex) {
         }
     });
 }
+
+// --- PWA Custom Install Prompt ---
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Update UI to notify the user they can install the PWA
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+        installBtn.classList.remove('hidden');
+    }
+});
+
+window.addEventListener('appinstalled', (evt) => {
+    console.log('App was installed successfully!');
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+        installBtn.classList.add('hidden');
+    }
+    deferredPrompt = null;
+});

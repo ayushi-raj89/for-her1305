@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>For You ❤️</title>
+    
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="For Ayushi">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="manifest" href="manifest.json">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,8 +116,12 @@
             </button>
         </main>
 
-        <!-- Sound Controls & Music Indicator -->
+        <!-- Sound Controls & Music Indicator & PWA Install Button -->
         <footer class="menu-footer">
+            <button id="install-btn" class="install-btn glass-btn hidden" aria-label="Install App">
+                <i data-lucide="download" class="install-icon"></i>
+                <span>Install App</span>
+            </button>
             <button id="music-toggle" class="music-btn" aria-label="Toggle music">
                 <div class="sound-wave">
                     <span class="bar"></span>
@@ -462,6 +474,17 @@
             </div>
         </div>
     </div>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker registered successfully!', reg.scope))
+                    .catch((err) => console.error('Service Worker registration failed:', err));
+            });
+        }
+    </script>
 
     <!-- Script imports -->
     <script src="app.js"></script>
