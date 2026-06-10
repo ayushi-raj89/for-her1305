@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    
+    <!-- Video Background -->
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="assets/bgvideo.mp4" type="video/mp4">
+    </video>
+
+    <!-- Dark Overlay for readability -->
+    <div id="video-overlay"></div>
+
+    <!-- Particle Background -->
+    <div id="particles-container"></div>
+
+    <!-- Lyrics Background Layer -->
+    <div id="lyrics-background">
+        <p id="bg-lyric-line" class="lyric-line"></p>
+    </div>
+    
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source src="assets/bg_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. Lock / Welcome Screen -->
+    <div id="welcome-screen" class="screen active">
+        <div class="welcome-card glass-card">
+            <h1 class="welcome-title">For Ayushi</h1>
+            <p class="welcome-subtitle">A little surprise awaits you...</p>
+            <button id="unlock-btn" class="btn btn-primary">
+                <span>Open Surprise</span>
+                <i data-lucide="lock-open" class="btn-icon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Main Menu / Choose Envelope Screen -->
+    <div id="menu-screen" class="screen">
+        <header class="main-header">
+            <h1 class="app-title">Choose an envelope</h1>
+            <p class="app-subtitle">Explore the little things I love about us.</p>
+        </header>
+
+        <main class="envelope-grid">
+            <!-- Envelope 1: Our Memories -->
+            <button class="menu-card glass-card" style="--item-index: 1;" onclick="navigateTo('memories-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="image" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Our Memories</h2>
+                <p class="card-desc">A gallery of our best moments together.</p>
+            </button>
+
+            <!-- Envelope 2: My Letter -->
+            <button class="menu-card glass-card" style="--item-index: 2;" onclick="navigateTo('letter-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="mail" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">My Letter</h2>
+                <p class="card-desc">A handwritten letter straight from the heart.</p>
+            </button>
+
+            <!-- Envelope 3: Why I Love You -->
+            <button class="menu-card glass-card" style="--item-index: 3;" onclick="navigateTo('reasons-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="heart" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Why I Love You</h2>
+                <p class="card-desc">A list of all the things that make you special.</p>
+            </button>
+
+            <!-- Envelope 4: Next Date When? -->
+            <button class="menu-card glass-card" style="--item-index: 4;" onclick="navigateTo('date-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="calendar" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Next Date When?</h2>
+                <p class="card-desc">Choose the time and date for our next date.</p>
+            </button>
+
+            <!-- Envelope 5: Our Song -->
+            <button class="menu-card glass-card" style="--item-index: 5;" onclick="navigateTo('lyrics-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="disc" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Our Song</h2>
+                <p class="card-desc">Sit back and listen to the song I chose for you.</p>
+            </button>
+        </main>
+
+        <!-- Sound Controls & Music Indicator -->
+        <footer class="menu-footer">
+            <button id="music-toggle" class="music-btn" aria-label="Toggle music">
+                <div class="sound-wave">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+                <i data-lucide="music" class="music-icon"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- 3. Screen: Our Memories -->
+    <div id="memories-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">Our Best Moments</h1>
+                <p class="section-subtitle">Click on an image to see it clearly.</p>
+            </header>
+
+            <div class="gallery-grid">
+                <div class="gallery-item glass-card" style="--item-index: 1;" onclick="openLightbox(1)">
+                    <img src="assets/memory1.png" alt="Memory 1" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>View Moment</span>
+                    </div>
+                </div>
+                <div class="gallery-item glass-card" style="--item-index: 2;" onclick="openLightbox(2)">
+                    <img src="assets/memory2.png" alt="Memory 2" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>View Moment</span>
+                    </div>
+                </div>
+                <div class="gallery-item glass-card" style="--item-index: 3;" onclick="openLightbox(3)">
+                    <img src="assets/memory3.png" alt="Memory 3" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>View Moment</span>
+                    </div>
+                </div>
+                <div class="gallery-item glass-card" style="--item-index: 4;" onclick="openLightbox(4)">
+                    <img src="assets/memory4.png" alt="Memory 4" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>View Moment</span>
+                    </div>
+                </div>
+                <div class="gallery-item glass-card" style="--item-index: 5;" onclick="openLightbox(5)">
+                    <img src="assets/memory5.png" alt="Memory 5" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>View Moment</span>
+                    </div>
+                </div>
+                <div class="gallery-item glass-card" style="--item-index: 6;" onclick="openLightbox(6)">
+                    <img src="assets/memory6.png" alt="Memory 6" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>View Moment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Screen: My Letter -->
+    <div id="letter-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">To My Valentine</h1>
+            </header>
+
+            <div class="letter-container">
+                <!-- Outer Envelope Element -->
+                <div class="envelope-wrapper" onclick="toggleEnvelope()">
+                    <div class="envelope">
+                        <div class="envelope-front"></div>
+                        <div class="envelope-flap"></div>
+                        <div class="letter glass-card">
+                            <div class="letter-content">
+                                <p class="letter-salutation">Dearest Ayushi,</p>
+                                <p class="letter-body">
+                                    I wanted to take a moment to tell you how incredibly lucky I feel to have you in my life.
+                                </p>
+                                <p class="letter-body">
+                                    Every day with you is a new adventure, and your smile is literally my favorite thing in the world. You bring so much light and joy into my days.
+                                </p>
+                                <p class="letter-body">
+                                    I can't wait to make a million more beautiful memories with you.
+                                </p>
+                                <p class="letter-signature">Forever yours,<br><span class="sig-name">Shivam</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="envelope-instruction">
+                        <i data-lucide="pointer" class="instruction-icon"></i>
+                        <span>Click to open the letter</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Screen: Why I Love You -->
+    <div id="reasons-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">Why I Love You</h1>
+                <p class="section-subtitle">A few reasons why you are my favorite person.</p>
+            </header>
+
+            <div class="reasons-list-wrapper">
+                <ul class="reasons-list">
+                    <li class="reason-item glass-card" style="--item-index: 1;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">You make my bad days softer and my good days brighter.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 2;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">You listen – really listen – and that means everything to me.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 3;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">You're my calm and my beautiful chaos at the same time.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 4;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">You support my dreams as if they were your own.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 5;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">Just being around you feels like home.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 6;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">I love you through every single doubt, every distance, and every day that lies ahead.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 7;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">I love you because even on our hardest days, you are the only one I want to talk to.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 8;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">I love you for your warmth, your care, and the beautiful reassurance you give my heart.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 9;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">I love you in the quiet moments, in the chaos, and in everything in between.</p>
+                    </li>
+                    <li class="reason-item glass-card" style="--item-index: 10;">
+                        <div class="reason-icon">
+                            <i data-lucide="heart" class="active-heart"></i>
+                        </div>
+                        <p class="reason-text">I love you simply because you are my home, my peace, and my favorite adventure.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Screen: Date Night Invitation -->
+    <div id="date-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">next date when ?</h1>
+                <p class="section-subtitle">Pick the perfect time for our next meetup.</p>
+            </header>
+
+            <div class="ticket-container">
+                <!-- Ticket-style Card -->
+                <div class="ticket glass-card" id="date-ticket">
+                    <div class="ticket-header">
+                        <div class="ticket-badge">EXCLUSIVELY FOR YOU</div>
+                        <h2 class="ticket-title">Our Next Date</h2>
+                    </div>
+                    
+                    <div class="ticket-divider">
+                        <div class="notch left"></div>
+                        <div class="dashed-line"></div>
+                        <div class="notch right"></div>
+                    </div>
+                    
+                    <div class="ticket-body">
+                        <div class="ticket-form" id="rsvp-controls">
+                            <div class="input-row">
+                                <div class="form-group">
+                                    <label for="date-picker" class="info-label">SELECT DATE</label>
+                                    <input type="date" id="date-picker" class="glass-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="time-picker" class="info-label">SELECT TIME</label>
+                                    <input type="time" id="time-picker" class="glass-input">
+                                </div>
+                            </div>
+                            <div class="rsvp-actions" style="margin-top: 24px;">
+                                <button class="btn btn-rsvp" id="rsvp-yes-btn">
+                                    <span>Lock in our date!</span>
+                                    <i data-lucide="heart-handshake"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="rsvp-success hidden" id="rsvp-success-message">
+                            <div class="success-icon-wrapper">
+                                <i data-lucide="heart" class="heart-pulse-slow"></i>
+                            </div>
+                            <h3>It's a date! ❤️</h3>
+                            <p id="rsvp-success-details" class="info-value" style="text-align: center; margin-top: 12px; line-height: 1.6;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Screen: Spotify Style Synced Lyrics Screen -->
+    <div id="lyrics-screen" class="screen">
+        <!-- Blurred Cover Art Backdrop -->
+        <div class="spotify-bg-blur" style="background-image: url('assets/memory1.png');"></div>
+        <div class="spotify-bg-overlay"></div>
+
+        <div class="spotify-container">
+            <header class="spotify-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+            </header>
+
+            <div class="spotify-layout">
+                <!-- Left Side: Cover Art & Playback Controls -->
+                <div class="spotify-player-left">
+                    <div class="spotify-album-card">
+                        <img src="assets/memory1.png" alt="Album Cover" class="spotify-cover-img">
+                    </div>
+                    
+                    <div class="spotify-song-info">
+                        <h2 class="spotify-song-title">Until I Found You</h2>
+                        <p class="spotify-song-artist">Stephen Sanchez</p>
+                    </div>
+
+                    <!-- Progress Bar Slider -->
+                    <div class="spotify-progress-container">
+                        <span class="progress-time" id="spotify-time-current">0:00</span>
+                        <div class="spotify-progress-bar" id="spotify-progress-track">
+                            <div class="spotify-progress-fill" id="spotify-progress-fill"></div>
+                        </div>
+                        <span class="progress-time" id="spotify-time-duration">2:57</span>
+                    </div>
+
+                    <!-- Media Controls -->
+                    <div class="spotify-controls">
+                        <button class="spotify-ctrl-btn secondary" id="spotify-shuffle-btn" aria-label="Shuffle">
+                            <i data-lucide="shuffle"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn" id="spotify-prev-btn" aria-label="Previous 10s">
+                            <i data-lucide="skip-back"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn play-pause-main" id="spotify-play-btn" aria-label="Play/Pause">
+                            <i data-lucide="play" id="spotify-play-icon"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn" id="spotify-next-btn" aria-label="Next 10s">
+                            <i data-lucide="skip-forward"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn secondary" id="spotify-repeat-btn" aria-label="Repeat">
+                            <i data-lucide="repeat"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Side: Synced Lyrics Column -->
+                <div class="spotify-player-right">
+                    <div class="spotify-lyrics-scroll" id="spotify-lyrics-list">
+                        <!-- Lyrics lines mapped with data-time matching app.js lyricData -->
+                        <div class="spotify-lyric-line" data-time="0">♪ (Intro) ♪</div>
+                        <div class="spotify-lyric-line" data-time="10.6">georgia, wrap me up in all your...</div>
+                        <div class="spotify-lyric-line" data-time="17.0">i want ya, in my arms</div>
+                        <div class="spotify-lyric-line" data-time="22.4">oh, let me hold ya</div>
+                        <div class="spotify-lyric-line" data-time="27.8">i'll never let you go again, like i did</div>
+                        <div class="spotify-lyric-line" data-time="33.4">oh, i used to say</div>
+                        <div class="spotify-lyric-line" data-time="37.4">"i would never fall in love again until i found her"</div>
+                        <div class="spotify-lyric-line" data-time="44.2">i said, "i would never fall unless it's you i fall into"</div>
+                        <div class="spotify-lyric-line" data-time="51.4">i was lost within the darkness, but then i found her</div>
+                        <div class="spotify-lyric-line" data-time="58.2">i found you</div>
+                        <div class="spotify-lyric-line" data-time="67.7">georgia, pulled me in, i asked to...</div>
+                        <div class="spotify-lyric-line" data-time="74.4">love her, once again</div>
+                        <div class="spotify-lyric-line" data-time="79.5">you fell, i caught ya</div>
+                        <div class="spotify-lyric-line" data-time="83.3">i'll never let you go again, like i did</div>
+                        <div class="spotify-lyric-line" data-time="90.7">oh, i used to say</div>
+                        <div class="spotify-lyric-line" data-time="94.2">"i would never fall in love again until i found her"</div>
+                        <div class="spotify-lyric-line" data-time="101.3">i said, "i would never fall unless it's you i fall into"</div>
+                        <div class="spotify-lyric-line" data-time="108.4">i was lost within the darkness, but then i found her</div>
+                        <div class="spotify-lyric-line" data-time="115.2">i found you</div>
+                        <div class="spotify-lyric-line" data-time="136.8">"i would never fall in love again until i found her"</div>
+                        <div class="spotify-lyric-line" data-time="144.0">i said, "i would never fall unless it's you i fall into"</div>
+                        <div class="spotify-lyric-line" data-time="151.2">i was lost within the darkness, but then i found her</div>
+                        <div class="spotify-lyric-line" data-time="157.9">i found you</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Gallery Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <div class="lightbox-content glass-card" onclick="event.stopPropagation()">
+            <div class="lightbox-layout">
+                <div class="lightbox-img-wrapper">
+                    <img id="lightbox-img" src="" alt="Zoomed memory">
+                </div>
+                <div class="lightbox-info">
+                    <h3 id="lightbox-title" class="lightbox-title"></h3>
+                    <div id="lightbox-caption" class="lightbox-caption"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script imports -->
+    <script src="app.js"></script>
+</body>
+</html>
