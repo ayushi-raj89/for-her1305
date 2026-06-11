@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>For You ❤️</title>
+
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="For Ayushi">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- TweetNaCl Cryptography Library -->
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css?v=2.0.3">
+</head>
+
+<body class="dark-theme">
+
+    <!-- Video Background -->
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="assets/bgvideo.mp4" type="video/mp4">
+    </video>
+
+    <!-- Dark Overlay for readability -->
+    <div id="video-overlay"></div>
+
+    <!-- Particle Background -->
+    <div id="particles-container"></div>
+
+    <!-- Lyrics Background Layer -->
+    <div id="lyrics-background">
+        <p id="bg-lyric-line" class="lyric-line"></p>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bg-music">
+        <source src="assets/bg_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 0. First-Visit Setup Screen (E2E Setup) -->
+    <div id="setup-screen" class="setup-overlay hidden">
+        <div class="setup-card glass-card">
+            <h2 class="setup-title">Welcome to Our World</h2>
+            <p class="setup-subtitle">Connect your devices securely with end-to-end encryption.</p>
+            
+            <div class="setup-form">
+                <!-- Supabase Settings (Optional, shown if placeholders empty) -->
+                <div id="setup-supabase-fields" class="hidden">
+                    <div class="form-group">
+                        <label for="setup-supabase-url" class="info-label">SUPABASE URL</label>
+                        <input type="text" id="setup-supabase-url" class="glass-input" placeholder="https://your-project.supabase.co">
+                    </div>
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="setup-supabase-key" class="info-label">SUPABASE ANON KEY</label>
+                        <input type="password" id="setup-supabase-key" class="glass-input" placeholder="Project public anon key...">
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="setup-secret-code" class="info-label">SHARED SECRET CODE</label>
+                    <input type="password" id="setup-secret-code" class="glass-input" placeholder="Enter secret code here...">
+                    <p class="input-help">Both Shivam and Ayushi must enter the exact same code to sync and read data.</p>
+                </div>
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label class="info-label">WHO ARE YOU?</label>
+                    <div class="setup-roles-row">
+                        <button type="button" id="role-shivam-btn" class="role-select-btn" onclick="selectSetupRole('Shivam')">Shivam</button>
+                        <button type="button" id="role-ayushi-btn" class="role-select-btn" onclick="selectSetupRole('Ayushi')">Ayushi</button>
+                    </div>
+                </div>
+                
+                <button type="button" id="setup-submit-btn" class="btn btn-primary" style="margin-top: 24px; width: 100%;">
+                    <span>Save & Connect</span>
+                    <i data-lucide="shield-check" class="btn-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Magical Opening Screen -->
+    <div id="welcome-screen" class="screen active welcome-theme">
+        <canvas id="welcome-stars-canvas"></canvas>
+        <div id="galaxy-orb"></div>
+        <div class="welcome-content">
+            <div id="welcome-text-container">
+                <h1 id="welcome-text"></h1>
+            </div>
+            <button id="enter-btn" class="btn btn-primary welcome-enter-btn">
+                <span>Enter Our World</span>
+                <i data-lucide="compass" class="btn-icon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Main Menu / Choose Envelope Screen -->
+    <div id="menu-screen" class="screen">
+        <header class="main-header">
+            <div class="days-counter-badge glass-card" id="days-counter-container">
+                <i data-lucide="heart" class="heart-pulse-slow active-heart"></i>
+                <span id="days-counter">0 Days Together</span>
+            </div>
+            <h1 class="app-title">Choose an envelope</h1>
+            <p class="app-subtitle">Explore the little things I love about us.</p>
+        </header>
+
+        <main class="envelope-grid">
+            <!-- Envelope 1: Memories -->
+            <button class="menu-card glass-card" style="--item-index: 1;" onclick="navigateTo('memories-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="image" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Memories</h2>
+                <p class="card-desc">A gallery of our best moments together.</p>
+            </button>
+
+            <!-- Envelope 2: Love Letters -->
+            <button class="menu-card glass-card" style="--item-index: 2;" onclick="navigateTo('letter-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="mail" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Love Letters</h2>
+                <p class="card-desc">Handwritten letters straight from the heart.</p>
+            </button>
+
+            <!-- Envelope 3: Why I Love You -->
+            <button class="menu-card glass-card" style="--item-index: 3;" onclick="navigateTo('reasons-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="heart" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Why I Love You</h2>
+                <p class="card-desc">A list of all the things that make you special.</p>
+            </button>
+
+            <!-- Envelope 4: Date Planner -->
+            <button class="menu-card glass-card" style="--item-index: 4;" onclick="navigateTo('date-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="calendar" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Date Planner</h2>
+                <p class="card-desc">Choose the time, place, and activity for our next date.</p>
+            </button>
+
+            <!-- Envelope 5: Our Song -->
+            <button class="menu-card glass-card" style="--item-index: 5;" onclick="navigateTo('lyrics-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="disc" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Our Song</h2>
+                <p class="card-desc">Sit back and listen to the song I chose for you.</p>
+            </button>
+
+            <!-- Envelope 6: Our World -->
+            <button class="menu-card glass-card" style="--item-index: 6;" onclick="navigateTo('secret-screen')">
+                <div class="card-icon-wrapper">
+                    <i data-lucide="globe" class="card-icon"></i>
+                </div>
+                <h2 class="card-title">Our World</h2>
+                <p class="card-desc">Float in our private universe together.</p>
+            </button>
+        </main>
+
+        <!-- Sound Controls & Music Indicator & PWA Install Button -->
+        <footer class="menu-footer">
+            <button id="install-btn" class="install-btn glass-btn hidden" aria-label="Install App">
+                <i data-lucide="download" class="install-icon"></i>
+                <span>Install App</span>
+            </button>
+            <button id="music-toggle" class="music-btn" aria-label="Toggle music">
+                <div class="sound-wave">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+                <i data-lucide="music" class="music-icon"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- 3. Screen: Our Memories -->
+    <div id="memories-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">Our Best Moments</h1>
+                <p class="section-subtitle">Click on an image to see it clearly.</p>
+            </header>
+
+            <div class="gallery-grid" id="memories-gallery-grid">
+                <!-- Dynamic Memories Injected Here -->
+            </div>
+        </div>
+        <button id="add-memory-btn" class="floating-action-btn" onclick="openModal('add-memory-modal')" aria-label="Add Memory">
+            <i data-lucide="plus"></i>
+        </button>
+    </div>
+
+    <!-- 4. Screen: Love Letters -->
+    <div id="letter-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">Love Letters</h1>
+            </header>
+
+            <div class="tabs-container glass-card"
+                style="margin: 0 auto 36px auto; display: flex; justify-content: center; max-width: max-content;">
+                <button id="tab-letters-him" class="tab-btn active" onclick="switchLettersTab('him')">From Him</button>
+                <button id="tab-letters-her" class="tab-btn" onclick="switchLettersTab('her')">From Her</button>
+            </div>
+
+            <div class="letters-write-row" style="text-align: center; margin-bottom: 24px;">
+                <button class="btn btn-primary" onclick="openModal('write-letter-modal')">
+                    <span>Write a Letter</span>
+                    <i data-lucide="feather"></i>
+                </button>
+            </div>
+
+            <!-- Tab: From Him -->
+            <div id="letters-from-him" class="tab-panel active">
+                <div class="letters-grid" id="letters-from-him-grid">
+                    <!-- Dynamic Letters Injected Here -->
+                </div>
+            </div>
+
+            <!-- Tab: From Her -->
+            <div id="letters-from-her" class="tab-panel">
+                <div class="letters-grid" id="letters-from-her-grid">
+                    <!-- Dynamic Letters Injected Here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parchment Letter Reader Modal Overlay -->
+    <div id="letter-reader-modal" class="letter-modal" onclick="closeFullLetter()">
+        <div class="letter-modal-content parchment-glass-card" onclick="event.stopPropagation()">
+            <button class="letter-modal-close" onclick="closeFullLetter()">&times;</button>
+            <div class="letter-modal-body" id="full-letter-display">
+                <!-- Dynamic Content Injected in app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Screen: Why I Love You -->
+    <div id="reasons-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">Why I Love You</h1>
+                <p class="section-subtitle">A few reasons why you are my favorite person.</p>
+            </header>
+
+            <div class="tabs-container glass-card"
+                style="margin: 0 auto 36px auto; display: flex; justify-content: center; max-width: max-content;">
+                <button id="tab-reasons-his" class="tab-btn active" onclick="switchReasonsTab('his')">His
+                    Reasons</button>
+                <button id="tab-reasons-her" class="tab-btn" onclick="switchReasonsTab('her')">Her Reasons</button>
+            </div>
+
+            <div id="reasons-add-row" class="reasons-add-row hidden" style="text-align: center; margin-bottom: 24px;">
+                <button class="btn btn-primary" onclick="openModal('add-reason-modal')">
+                    <span>Add Reason</span>
+                    <i data-lucide="heart"></i>
+                </button>
+            </div>
+
+            <!-- Tab Panel: His Reasons -->
+            <div id="reasons-his" class="tab-panel active">
+                <div class="reasons-list-wrapper">
+                    <ul class="reasons-list" id="reasons-his-list">
+                        <!-- Dynamic Reasons Injected Here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Her Reasons -->
+            <div id="reasons-her" class="tab-panel">
+                <div class="reasons-list-wrapper">
+                    <ul class="reasons-list" id="reasons-her-list">
+                        <!-- Dynamic Reasons Injected Here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Screen: Date Night Invitation -->
+    <div id="date-screen" class="screen">
+        <div class="container">
+            <header class="section-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <p class="lyric-line screen-lyric"></p>
+                <h1 class="section-title">next date when ?</h1>
+                <p class="section-subtitle">Pick the perfect time for our next meetup.</p>
+            </header>
+
+            <div class="ticket-container">
+                <!-- Ticket-style Card -->
+                <div class="ticket glass-card" id="date-ticket">
+                    <div class="ticket-header">
+                        <div class="ticket-badge">EXCLUSIVELY FOR YOU</div>
+                        <h2 class="ticket-title">Our Next Date</h2>
+                    </div>
+
+                    <div class="ticket-divider">
+                        <div class="notch left"></div>
+                        <div class="dashed-line"></div>
+                        <div class="notch right"></div>
+                    </div>
+
+                    <div class="ticket-body">
+                        <div class="ticket-form" id="rsvp-controls">
+                            <div class="input-row">
+                                <div class="form-group">
+                                    <label for="date-picker" class="info-label">SELECT DATE</label>
+                                    <input type="date" id="date-picker" class="glass-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="time-picker" class="info-label">SELECT TIME</label>
+                                    <input type="time" id="time-picker" class="glass-input">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 16px; width: 100%;">
+                                <label for="place-picker" class="info-label">PLACE IDEA</label>
+                                <input type="text" id="place-picker" class="glass-input"
+                                    placeholder="e.g. Sanjay Van, Cozy Cafe, PW Class...">
+                            </div>
+
+                            <div class="form-group" style="margin-top: 16px; width: 100%;">
+                                <label for="activity-picker" class="info-label">ACTIVITY IDEA</label>
+                                <input type="text" id="activity-picker" class="glass-input"
+                                    placeholder="e.g. Walking, Coffee & talks, Metro ride...">
+                            </div>
+
+                            <div class="rsvp-actions" style="margin-top: 24px;">
+                                <button class="btn btn-rsvp" id="rsvp-yes-btn">
+                                    <span>Lock in our date!</span>
+                                    <i data-lucide="heart-handshake"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="rsvp-success hidden" id="rsvp-success-message">
+                            <div class="success-icon-wrapper">
+                                <i data-lucide="heart" class="heart-pulse-slow"></i>
+                            </div>
+                            <h3>It's a date! ❤️</h3>
+                            <p id="rsvp-success-details" class="info-value"
+                                style="text-align: center; margin-top: 12px; line-height: 1.6;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Screen: Spotify Style Synced Lyrics Screen -->
+    <div id="lyrics-screen" class="screen">
+        <!-- Blurred Cover Art Backdrop -->
+        <div class="spotify-bg-blur" style="background-image: url('assets/memory1.png');"></div>
+        <div class="spotify-bg-overlay"></div>
+
+        <div class="spotify-container">
+            <header class="spotify-header">
+                <button class="back-btn" onclick="navigateTo('menu-screen')">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back</span>
+                </button>
+                <button id="add-song-btn" class="glass-btn add-song-header-btn" onclick="openModal('add-song-modal')" style="margin-left: auto; display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-size: 13px;">
+                    <i data-lucide="music" style="width: 14px; height: 14px; color: var(--accent);"></i>
+                    <span>Add Song</span>
+                </button>
+            </header>
+
+            <div class="spotify-layout">
+                <!-- Left Side: Cover Art & Playback Controls -->
+                <div class="spotify-player-left">
+                    <div class="spotify-album-card">
+                        <img src="assets/memory1.png" alt="Album Cover" class="spotify-cover-img">
+                    </div>
+
+                    <div class="spotify-song-info">
+                        <h2 class="spotify-song-title">Until I Found You</h2>
+                        <p class="spotify-song-artist">Stephen Sanchez</p>
+                    </div>
+
+                    <!-- Progress Bar Slider -->
+                    <div class="spotify-progress-container">
+                        <span class="progress-time" id="spotify-time-current">0:00</span>
+                        <div class="spotify-progress-bar" id="spotify-progress-track">
+                            <div class="spotify-progress-fill" id="spotify-progress-fill"></div>
+                        </div>
+                        <span class="progress-time" id="spotify-time-duration">2:57</span>
+                    </div>
+
+                    <!-- Media Controls -->
+                    <div class="spotify-controls">
+                        <button class="spotify-ctrl-btn secondary" id="spotify-shuffle-btn" aria-label="Shuffle">
+                            <i data-lucide="shuffle"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn" id="spotify-prev-btn" aria-label="Previous Song">
+                            <i data-lucide="skip-back"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn play-pause-main" id="spotify-play-btn" aria-label="Play/Pause">
+                            <i data-lucide="play" id="spotify-play-icon"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn" id="spotify-next-btn" aria-label="Next Song">
+                            <i data-lucide="skip-forward"></i>
+                        </button>
+                        <button class="spotify-ctrl-btn secondary" id="spotify-repeat-btn" aria-label="Repeat">
+                            <i data-lucide="repeat"></i>
+                        </button>
+                    </div>
+
+                    <!-- Playlist Library Container -->
+                    <div class="spotify-song-list-wrapper" id="spotify-song-list-container">
+                        <!-- Dynamic Songs Injected Here -->
+                    </div>
+                </div>
+
+                <!-- Right Side: Synced Lyrics Column -->
+                <div class="spotify-player-right">
+                    <div class="spotify-lyrics-scroll" id="spotify-lyrics-list">
+                        <!-- Lyrics lines mapped with data-time matching app.js lyricData -->
+                        <div class="spotify-lyric-line" data-time="0">♪ (Intro) ♪</div>
+                        <div class="spotify-lyric-line" data-time="10.6">georgia, wrap me up in all your...</div>
+                        <div class="spotify-lyric-line" data-time="17.0">i want ya, in my arms</div>
+                        <div class="spotify-lyric-line" data-time="22.4">oh, let me hold ya</div>
+                        <div class="spotify-lyric-line" data-time="27.8">i'll never let you go again, like i did</div>
+                        <div class="spotify-lyric-line" data-time="33.4">oh, i used to say</div>
+                        <div class="spotify-lyric-line" data-time="37.4">"i would never fall in love again until i found
+                            her"</div>
+                        <div class="spotify-lyric-line" data-time="44.2">i said, "i would never fall unless it's you i
+                            fall into"</div>
+                        <div class="spotify-lyric-line" data-time="51.4">i was lost within the darkness, but then i
+                            found her</div>
+                        <div class="spotify-lyric-line" data-time="58.2">i found you</div>
+                        <div class="spotify-lyric-line" data-time="67.7">georgia, pulled me in, i asked to...</div>
+                        <div class="spotify-lyric-line" data-time="74.4">love her, once again</div>
+                        <div class="spotify-lyric-line" data-time="79.5">you fell, i caught ya</div>
+                        <div class="spotify-lyric-line" data-time="83.3">i'll never let you go again, like i did</div>
+                        <div class="spotify-lyric-line" data-time="90.7">oh, i used to say</div>
+                        <div class="spotify-lyric-line" data-time="94.2">"i would never fall in love again until i found
+                            her"</div>
+                        <div class="spotify-lyric-line" data-time="101.3">i said, "i would never fall unless it's you i
+                            fall into"</div>
+                        <div class="spotify-lyric-line" data-time="108.4">i was lost within the darkness, but then i
+                            found her</div>
+                        <div class="spotify-lyric-line" data-time="115.2">i found you</div>
+                        <div class="spotify-lyric-line" data-time="136.8">"i would never fall in love again until i
+                            found her"</div>
+                        <div class="spotify-lyric-line" data-time="144.0">i said, "i would never fall unless it's you i
+                            fall into"</div>
+                        <div class="spotify-lyric-line" data-time="151.2">i was lost within the darkness, but then i
+                            found her</div>
+                        <div class="spotify-lyric-line" data-time="157.9">i found you</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. Screen: Our World Secret Screen -->
+    <div id="secret-screen" class="screen">
+        <canvas id="secret-canvas"></canvas>
+        <div class="secret-container glass-card">
+            <header class="secret-header"
+                style="width: 100%; display: flex; justify-content: flex-start; margin-bottom: 20px;">
+                <button class="back-btn" onclick="exitSecretScreen()" style="position: static; transform: none;">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Leave Our World</span>
+                </button>
+            </header>
+            <div class="secret-content">
+                <div class="secret-icon-wrapper"
+                    style="color: var(--accent); margin-bottom: 16px; display: inline-flex; justify-content: center;">
+                    <i data-lucide="heart" class="heart-pulse-slow active-heart" style="width: 42px; height: 42px;"></i>
+                </div>
+                <h1 class="secret-title" style="margin-bottom: 24px;">Our World</h1>
+                <div class="quote-container"
+                    style="border-left: 2px solid var(--accent); padding-left: 16px; text-align: left; margin-bottom: 24px;">
+                    <p id="daily-quote" class="daily-quote"></p>
+                    <span class="quote-author"
+                        style="color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">—
+                        a little daily reminder</span>
+                </div>
+                <div class="secret-message-box">
+                    <p class="secret-msg-text">No matter where we are in this universe, we are always under the same
+                        stars, looking at the same sky, holding each other in our hearts. This is our little place, just
+                        for us. ✨</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Gallery Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <div class="lightbox-content glass-card" onclick="event.stopPropagation()">
+            <div class="lightbox-layout">
+                <div class="lightbox-img-wrapper">
+                    <img id="lightbox-img" src="" alt="Zoomed memory">
+                </div>
+                <div class="lightbox-info">
+                    <h3 id="lightbox-title" class="lightbox-title"></h3>
+                    <div id="lightbox-date" class="lightbox-date"
+                        style="color:var(--gold); font-size:12px; font-weight:600; text-transform:uppercase; margin-bottom:12px; letter-spacing:1px;">
+                    </div>
+                    <div id="lightbox-caption" class="lightbox-caption"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Memory -->
+    <div id="add-memory-modal" class="custom-modal" onclick="closeModal('add-memory-modal')">
+        <div class="modal-content glass-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal('add-memory-modal')">&times;</button>
+            <h2 class="modal-title">Add New Memory</h2>
+            <form id="memory-form" onsubmit="handleMemorySubmit(event)">
+                <div class="form-group">
+                    <label for="memory-title" class="info-label">MEMORIES TITLE</label>
+                    <input type="text" id="memory-title" class="glass-input" required placeholder="e.g., The weekend promise...">
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="memory-desc" class="info-label">MEMORIES DESCRIPTION</label>
+                    <textarea id="memory-desc" class="glass-input textarea" rows="3" required placeholder="Describe our memory..."></textarea>
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="memory-file" class="info-label">UPLOAD PHOTO</label>
+                    <input type="file" id="memory-file" class="glass-input file-input" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 24px; width: 100%;">
+                    <span>Share Memory</span>
+                    <i data-lucide="image" class="btn-icon"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Song -->
+    <div id="add-song-modal" class="custom-modal" onclick="closeModal('add-song-modal')">
+        <div class="modal-content glass-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal('add-song-modal')">&times;</button>
+            <h2 class="modal-title">Upload Our Song</h2>
+            <form id="song-form" onsubmit="handleSongSubmit(event)">
+                <div class="form-group">
+                    <label for="song-title-input" class="info-label">SONG TITLE</label>
+                    <input type="text" id="song-title-input" class="glass-input" required placeholder="e.g., Until I Found You...">
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="song-artist-input" class="info-label">ARTIST NAME</label>
+                    <input type="text" id="song-artist-input" class="glass-input" required placeholder="Stephen Sanchez...">
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="song-file" class="info-label">UPLOAD MP3 FILE</label>
+                    <input type="file" id="song-file" class="glass-input file-input" accept="audio/mpeg" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 24px; width: 100%;">
+                    <span>Upload Song</span>
+                    <i data-lucide="music" class="btn-icon"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Write Letter -->
+    <div id="write-letter-modal" class="custom-modal" onclick="closeModal('write-letter-modal')">
+        <div class="modal-content glass-card letter-write-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal('write-letter-modal')">&times;</button>
+            <h2 class="modal-title" style="font-family: var(--font-heading); font-size: 26px;">Write a Letter</h2>
+            <form id="letter-form" onsubmit="handleLetterSubmit(event)">
+                <div class="form-group">
+                    <label for="letter-salutation-input" class="info-label">SALUTATION</label>
+                    <input type="text" id="letter-salutation-input" class="glass-input parchment-input" required placeholder="Dearest Ayushi,">
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="letter-body-input" class="info-label">LETTER BODY</label>
+                    <textarea id="letter-body-input" class="glass-input parchment-textarea" rows="6" required placeholder="Write your heart out here..."></textarea>
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="letter-signature-input" class="info-label">SIGNATURE</label>
+                    <input type="text" id="letter-signature-input" class="glass-input parchment-input" required placeholder="Forever yours, Shivam">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 24px; width: 100%;">
+                    <span>Send Letter</span>
+                    <i data-lucide="send" class="btn-icon"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Reason -->
+    <div id="add-reason-modal" class="custom-modal" onclick="closeModal('add-reason-modal')">
+        <div class="modal-content glass-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal('add-reason-modal')">&times;</button>
+            <h2 class="modal-title">Add Reason Why I Love You</h2>
+            <form id="reason-form" onsubmit="handleReasonSubmit(event)">
+                <div class="form-group">
+                    <label for="reason-text-input" class="info-label">REASON TEXT</label>
+                    <textarea id="reason-text-input" class="glass-input textarea" rows="3" required placeholder="Write a reason why you love her/him..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 24px; width: 100%;">
+                    <span>Save Reason</span>
+                    <i data-lucide="heart" class="btn-icon"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker registered successfully!', reg.scope))
+                    .catch((err) => console.error('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+
+    <!-- Script imports -->
+    <script src="app.js?v=2.0.1"></script>
+</body>
+
+</html>
