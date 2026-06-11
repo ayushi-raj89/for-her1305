@@ -1,0 +1,10 @@
+# Never commit secrets to GitHub
+assets/backend/
+assets/backend/anon-api-key.txt
+
+# Reference/design files not needed for production
+refrence theme/
+
+# OS files
+.DS_Store
+Thumbs.db

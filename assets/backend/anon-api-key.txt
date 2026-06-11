@@ -1,2 +1,0 @@
-anon public api key = sb_publishable_12aKqrmlvLFzDT9geW8FuQ_WiWoNf8i
-anon project url = https://ojrfgvmkecrehykiueii.supabase.co
